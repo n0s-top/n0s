@@ -1,78 +1,52 @@
 let NETLIFY_ACCESS_TOKEN = 'X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs';
 
-// Function to check subdomain availability
-async function checkAvailability() {
-  event.preventDefault();
-  const subdomainInput = document.getElementById("subdomain");
-  const siteIdInput = document.getElementById("siteId");
-  const subdomain = subdomainInput.value;
-  const siteId = siteIdInput.value;
-  const apiUrl = `https://api.netlify.com/api/v1/sites/${siteId}/subdomains/${subdomain}`;
-  const response = await fetch(apiUrl, {
-    headers: {
-      Authorization: `Bearer ${NETLIFY_ACCESS_TOKEN}`
-    }
-  });
-  const responseData = await response.json();
-  if (response.status === 404) {
-    alert(`The subdomain ${subdomain} is available!`);
-    const subdomainUrl = `https://${subdomain}.n0s.top`;
-    const confirmSubmission = confirm(`Do you want to submit ${subdomainUrl} as your subdomain?`);
-    if (confirmSubmission) {
-      createSubdomain(siteId, subdomain); // Call the createSubdomain function
-    }
-  } else {
-    alert(`The subdomain ${subdomain} is already taken. Please choose a different subdomain.`);
+function checkAvailability() {
+  const subdomain = document.getElementById("subdomain").value;
+  const siteId = document.getElementById("siteId").value;
+  
+  if (subdomain.trim() === "") {
+    alert("Please enter a subdomain name.");
+    return false;
   }
-}
-
-// Function to prevent submission when either input field is empty
-function disableSubmitIfEmpty() {
-  const subdomainInput = document.getElementById("subdomain");
-  const siteIdInput = document.getElementById("siteId");
-  const submitButton = document.getElementById("submit");
-  if (subdomainInput.value === "" || siteIdInput.value === "") {
-    submitButton.disabled = true;
-  } else {
-    submitButton.disabled = false;
+  
+  if (siteId.trim() === "") {
+    alert("Please enter a Netlify site ID.");
+    return false;
   }
-}
-
-// Function to create a new subdomain on Netlify
-async function createSubdomain(siteId, subdomain) {
-  const apiUrl = `https://api.netlify.com/api/v1/sites/${siteId}/subdomains`;
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${NETLIFY_ACCESS_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      hostname: subdomain
-    })
-  });
-  if (response.ok) {
-    alert(`The subdomain ${subdomain} has been created!`);
-    const subdomainUrl = `https://${subdomain}.n0s.top`;
-    const confirmSubmission = confirm(`Do you want to submit ${subdomainUrl} as your subdomain?`);
-    if (confirmSubmission) {
-      const redirectUrl = `https://app.netlify.com/sites/${siteId}/deploys?newSiteDomain=${subdomainUrl}`;
-      window.location.href = redirectUrl;
+  
+  const request = new XMLHttpRequest();
+  request.open("GET", `https://${subdomain}.n0s.top`, true);
+  
+  request.onload = function() {
+    if (request.status === 404) {
+      const request2 = new XMLHttpRequest();
+      request2.open("PUT", `https://api.netlify.com/api/v1/sites/${siteId}/subdomains/${subdomain}`);
+      request2.setRequestHeader("Content-Type", "application/json");
+      request2.setRequestHeader("Authorization", "Bearer <NETLIFY_ACCESS_TOKEN>");
+      
+      request2.onload = function() {
+        if (request2.status === 200) {
+          alert(`Subdomain ${subdomain}.n0s.top has been created and linked to your Netlify site.`);
+          location.reload();
+        } else {
+          alert(`Failed to link subdomain ${subdomain}.n0s.top to your Netlify site.`);
+        }
+      }
+      
+      request2.send(JSON.stringify({
+        subdomain: subdomain,
+        domain: "n0s.top"
+      }));
+    } else {
+      alert(`Subdomain ${subdomain}.n0s.top already exists. Please choose another subdomain name.`);
     }
-  } else {
-    const responseData = await response.json();
-    alert(`Failed to create the subdomain. Error message: ${responseData.message}`);
-  }
+  };
+  
+  request.onerror = function() {
+    alert(`Failed to check subdomain availability for ${subdomain}.n0s.top.`);
+  };
+  
+  request.send();
+  
+  return false;
 }
-
-// Attach event listeners
-const subdomainInput = document.getElementById("subdomain");
-const siteIdInput = document.getElementById("siteId");
-const accessTokenInput = document.getElementById("accessToken");
-const submitButton = document.getElementById("submit");
-subdomainInput.addEventListener("input", disableSubmitIfEmpty);
-siteIdInput.addEventListener("input", disableSubmitIfEmpty);
-accessTokenInput.addEventListener("input", () => {
-  NETLIFY_ACCESS_TOKEN = accessTokenInput.value;
-});
-submitButton.addEventListener("click", checkAvailability);

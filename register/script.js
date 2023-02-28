@@ -1,40 +1,44 @@
-function checkAvailability() {
+// Function to check subdomain availability
+async function checkAvailability() {
+  event.preventDefault();
   const subdomainInput = document.getElementById("subdomain");
   const siteIdInput = document.getElementById("siteId");
   const subdomain = subdomainInput.value;
   const siteId = siteIdInput.value;
-  const submitButton = document.getElementById("submit");
-
-  if (subdomain.length < 1) {
-    alert("Please enter a subdomain name");
-    return false;
-  }
-
-  if (siteId.length < 1) {
-    alert("Please enter a Netlify site ID");
-    return false;
-  }
-
-  submitButton.disabled = true;
-  submitButton.textContent = "Checking availability...";
-
-  const xhr = new XMLHttpRequest();
-  xhr.open("GET", `https://${subdomain}.n0s.top`, true);
-  xhr.onload = () => {
-    submitButton.disabled = false;
-    submitButton.textContent = "Check Availability and Submit";
-    if (xhr.status === 404) {
-      window.location.href = `https://app.netlify.com/sites/${siteId}/settings/domain#custom-domains`;
-    } else {
-      alert("Subdomain is not available");
+  const apiUrl = `https://api.netlify.com/api/v1/sites/${siteId}/subdomains/${subdomain}`;
+  const response = await fetch(apiUrl, {
+    headers: {
+      Authorization: `Bearer ${X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs}`
     }
-  };
-  xhr.onerror = () => {
-    submitButton.disabled = false;
-    submitButton.textContent = "Check Availability and Submit";
-    alert("There was an error checking the subdomain availability");
-  };
-  xhr.send();
-
-  return false;
+  });
+  const responseData = await response.json();
+  if (response.status === 404) {
+    alert(`The subdomain ${subdomain} is available!`);
+    const subdomainUrl = `https://${subdomain}.n0s.top`;
+    const confirmSubmission = confirm(`Do you want to submit ${subdomainUrl} as your subdomain?`);
+    if (confirmSubmission) {
+      const redirectUrl = `https://app.netlify.com/sites/${siteId}/deploys?newSiteDomain=${subdomainUrl}`;
+      window.location.href = redirectUrl;
+    }
+  } else {
+    alert(`The subdomain ${subdomain} is already taken. Please choose a different subdomain.`);
+  }
 }
+
+// Function to prevent submission when either input field is empty
+function disableSubmitIfEmpty() {
+  const subdomainInput = document.getElementById("subdomain");
+  const siteIdInput = document.getElementById("siteId");
+  const submitButton = document.getElementById("submit");
+  if (subdomainInput.value === "" || siteIdInput.value === "") {
+    submitButton.disabled = true;
+  } else {
+    submitButton.disabled = false;
+  }
+}
+
+// Attach event listeners
+const subdomainInput = document.getElementById("subdomain");
+const siteIdInput = document.getElementById("siteId");
+subdomainInput.addEventListener("input", disableSubmitIfEmpty);
+siteIdInput.addEventListener("input", disableSubmitIfEmpty);

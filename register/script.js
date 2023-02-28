@@ -18,7 +18,7 @@ function checkAvailability() {
   request.open("GET", `https://${subdomain}.n0s.top`, true);
 
   request.onload = function() {
-    if (request.status === 404) {
+    if (request.status === 404 || request.status === 0) {
       const request2 = new XMLHttpRequest();
       request2.open("PUT", `https://api.netlify.com/api/v1/sites/${siteId}/subdomains/${subdomain}`);
       request2.setRequestHeader("Content-Type", "application/json");
@@ -31,7 +31,7 @@ function checkAvailability() {
         } else {
           alert(`Failed to link subdomain ${subdomain}.n0s.top to your Netlify site.`);
         }
-      };
+      }
 
       request2.send(JSON.stringify({
         subdomain: subdomain,

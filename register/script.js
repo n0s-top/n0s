@@ -1,36 +1,63 @@
-// Wait for the DOM to be loaded
 document.addEventListener('DOMContentLoaded', () => {
 
-  // Get the form element
   const form = document.querySelector('form');
+  const submitButton = form.querySelector('button[type="submit"]');
+  const subdomainInput = document.getElementById('subdomain');
+  const siteIdInput = document.getElementById('siteId');
+  const message = document.getElementById('message');
 
-  // Add an event listener to the form
-  form.addEventListener('submit', event => {
+  submitButton.addEventListener('click', event => {
     event.preventDefault();
 
-    // Get the values of the subdomain and siteId inputs
-    const subdomain = document.getElementById('subdomain').value;
-    const siteId = document.getElementById('siteId').value;
-
-    // Replace "your-access-token" with your actual Netlify API access token
+    const subdomain = subdomainInput.value;
+    const siteId = siteIdInput.value;
     const ACCESS_TOKEN = 'X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs';
 
-    // Send a request to the Netlify API to add the custom domain
-    fetch(`https://api.netlify.com/api/v1/sites/${siteId}/domains`, {
-      method: 'POST',
+    // Disable the submit button to prevent multiple submissions
+    submitButton.disabled = true;
+
+    // Send a request to check the availability of the subdomain
+    fetch(`https://api.netlify.com/api/v1/sites/${siteId}/domains/check?hostname=${subdomain}.n0s.top`, {
       headers: {
-        'Authorization': `Bearer ${ACCESS_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ hostname: `${subdomain}.n0s.top` })
+        'Authorization': `Bearer ${ACCESS_TOKEN}`
+      }
     })
-      .then(response => {
-        if (response.ok) {
-          console.log(`Custom domain ${subdomain}.n0s.top added successfully!`);
+      .then(response => response.json())
+      .then(data => {
+        if (data.available) {
+          message.textContent = `Subdomain ${subdomain}.n0s.top is available. Adding custom domain...`;
+
+          // Send a request to the Netlify API to add the custom domain
+          fetch(`https://api.netlify.com/api/v1/sites/${siteId}/domains`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${ACCESS_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ hostname: `${subdomain}.n0s.top` })
+          })
+            .then(response => {
+              if (response.ok) {
+                message.textContent = `Custom domain ${subdomain}.n0s.top added successfully!`;
+              } else {
+                throw new Error(`Error adding custom domain: ${response.statusText}`);
+              }
+            })
+            .catch(error => {
+              message.textContent = `Error adding custom domain: ${error}`;
+              console.error(error);
+            });
         } else {
-          throw new Error(`Error adding custom domain: ${response.statusText}`);
+          message.textContent = `Subdomain ${subdomain}.n0s.top is not available. Please try another subdomain.`;
         }
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        message.textContent = `Error checking subdomain availability: ${error}`;
+        console.error(error);
+      })
+      .finally(() => {
+        // Enable the submit button after the request has completed
+        submitButton.disabled = false;
+      });
   });
 });

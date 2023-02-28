@@ -1,5 +1,5 @@
-let NETLIFY_ACCESS_TOKEN = 'X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs';
-let MAIN_DOMAIN = 'example.com'; // Replace with your main domain
+let NETLIFY_ACCESS_TOKEN = 'X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs'; // Replace with your netlify access token
+let MAIN_DOMAIN = 'n0s.top'; // Replace with your main domain
 
 function checkAvailability() {
   const subdomain = document.getElementById("subdomain").value;

@@ -1,4 +1,5 @@
 let NETLIFY_ACCESS_TOKEN = 'X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs';
+let MAIN_DOMAIN = 'example.com'; // Replace with your main domain
 
 function checkAvailability() {
   const subdomain = document.getElementById("subdomain").value;
@@ -26,8 +27,25 @@ function checkAvailability() {
 
       request2.onload = function() {
         if (request2.status === 200) {
-          alert(`Subdomain ${subdomain}.n0s.top has been created and linked to your Netlify site.`);
-          location.reload();
+          const request3 = new XMLHttpRequest();
+          request3.open("POST", `https://api.netlify.com/api/v1/dns_zones/${MAIN_DOMAIN}/dns_records`);
+          request3.setRequestHeader("Content-Type", "application/json");
+          request3.setRequestHeader("Authorization", `Bearer ${NETLIFY_ACCESS_TOKEN}`);
+
+          request3.onload = function() {
+            if (request3.status === 200) {
+              alert(`Subdomain ${subdomain}.n0s.top has been created and linked to your Netlify site, and DNS record has been added for ${subdomain}.${MAIN_DOMAIN}.`);
+              location.reload();
+            } else {
+              alert(`Failed to add DNS record for ${subdomain}.${MAIN_DOMAIN}.`);
+            }
+          }
+
+          request3.send(JSON.stringify({
+            type: "CNAME",
+            hostname: subdomain,
+            value: `${subdomain}.n0s.top`
+          }));
         } else {
           alert(`Failed to link subdomain ${subdomain}.n0s.top to your Netlify site.`);
         }

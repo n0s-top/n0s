@@ -16,43 +16,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Disable the submit button to prevent multiple submissions
     submitButton.disabled = true;
 
-    // Send a request to check the availability of the subdomain
-    fetch(`https://api.netlify.com/api/v1/sites/${siteId}/domains/check?hostname=${subdomain}.n0s.top`, {
-      headers: {
-        'Authorization': `Bearer ${ACCESS_TOKEN}`
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.available) {
-          message.textContent = `Subdomain ${subdomain}.n0s.top is available. Adding custom domain...`;
+    message.textContent = `Adding custom domain ${subdomain}.n0s.top...`;
 
-          // Send a request to the Netlify API to add the custom domain
-          fetch(`https://api.netlify.com/api/v1/sites/${siteId}/domains`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${ACCESS_TOKEN}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ hostname: `${subdomain}.n0s.top` })
-          })
-            .then(response => {
-              if (response.ok) {
-                message.textContent = `Custom domain ${subdomain}.n0s.top added successfully!`;
-              } else {
-                throw new Error(`Error adding custom domain: ${response.statusText}`);
-              }
-            })
-            .catch(error => {
-              message.textContent = `Error adding custom domain: ${error}`;
-              console.error(error);
-            });
+    // Send a request to the Netlify API to add the custom domain
+    fetch(`https://api.netlify.com/api/v1/sites/${siteId}/domains`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ hostname: `${subdomain}.n0s.top` })
+    })
+      .then(response => {
+        if (response.ok) {
+          message.textContent = `Custom domain ${subdomain}.n0s.top added successfully!`;
         } else {
-          message.textContent = `Subdomain ${subdomain}.n0s.top is not available. Please try another subdomain.`;
+          throw new Error(`Error adding custom domain: ${response.statusText}`);
         }
       })
       .catch(error => {
-        message.textContent = `Error checking subdomain availability: ${error}`;
+        message.textContent = `Error adding custom domain: ${error}`;
         console.error(error);
       })
       .finally(() => {

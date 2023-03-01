@@ -17,9 +17,8 @@ function checkAvailability() {
   }
 
   const request = new XMLHttpRequest();
-  request.open("GET", `${PROXY_SERVER}https://${subdomain}.${MAIN_DOMAIN}`, true);
-  request.setRequestHeader('origin', 'https://n0s.top');
-  request.setRequestHeader('x-requested-with', 'XMLHttpRequest');
+  request.open("GET", `${PROXY_SERVER}https://${subdomain}.n0s.top`, true);
+  request.withCredentials = true;
 
   request.onload = function() {
     if (request.status === 404 || request.status === 0) {
@@ -37,7 +36,7 @@ function checkAvailability() {
 
           request3.onload = function() {
             if (request3.status === 200) {
-              alert(`Subdomain ${subdomain}.${MAIN_DOMAIN} has been created and linked to your Netlify site, and DNS record has been added for ${subdomain}.${MAIN_DOMAIN}.`);
+              alert(`Subdomain ${subdomain}.n0s.top has been created and linked to your Netlify site, and DNS record has been added for ${subdomain}.${MAIN_DOMAIN}.`);
               location.reload();
             } else {
               alert(`Failed to add DNS record for ${subdomain}.${MAIN_DOMAIN}.`);
@@ -47,24 +46,24 @@ function checkAvailability() {
           request3.send(JSON.stringify({
             type: "CNAME",
             hostname: subdomain,
-            value: `${subdomain}.${MAIN_DOMAIN}`
+            value: `${subdomain}.n0s.top`
           }));
         } else {
-          alert(`Failed to link subdomain ${subdomain}.${MAIN_DOMAIN} to your Netlify site.`);
+          alert(`Failed to link subdomain ${subdomain}.n0s.top to your Netlify site.`);
         }
       }
 
       request2.send(JSON.stringify({
         subdomain: subdomain,
-        domain: MAIN_DOMAIN
+        domain: "n0s.top"
       }));
     } else {
-      alert(`Subdomain ${subdomain}.${MAIN_DOMAIN} already exists. Please choose another subdomain name.`);
+      alert(`Subdomain ${subdomain}.n0s.top already exists. Please choose another subdomain name.`);
     }
   };
 
   request.onerror = function() {
-    alert(`Failed to check subdomain availability for ${subdomain}.${MAIN_DOMAIN}.`);
+    alert(`Failed to check subdomain availability for ${subdomain}.n0s.top.`);
   };
 
   request.send();

@@ -1,5 +1,6 @@
 let NETLIFY_ACCESS_TOKEN = 'X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs'; // Replace with your netlify access token
 let MAIN_DOMAIN = 'n0s.top'; // Replace with your main domain
+let PROXY_SERVER = 'https://cors-anywhere.herokuapp.com/'; // Proxy server to bypass CORS restriction
 
 function checkAvailability() {
   const subdomain = document.getElementById("subdomain").value;
@@ -16,7 +17,8 @@ function checkAvailability() {
   }
 
   const request = new XMLHttpRequest();
-  request.open("GET", `https://${subdomain}.n0s.top`, true);
+  request.open("GET", `${PROXY_SERVER}https://${subdomain}.n0s.top`, true);
+  request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
   request.onload = function() {
     if (request.status === 404 || request.status === 0) {

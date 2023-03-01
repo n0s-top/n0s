@@ -17,7 +17,7 @@ function checkAvailability() {
   }
 
   const request = new XMLHttpRequest();
-  request.open("GET", `${PROXY_SERVER}https://${subdomain}.n0s.top`, true);
+  request.open("GET", `https://${subdomain}.n0s.top`, true);
   request.withCredentials = true;
 
   request.onload = function() {
@@ -70,3 +70,4 @@ function checkAvailability() {
 
   return false;
 }
+

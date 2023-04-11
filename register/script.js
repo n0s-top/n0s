@@ -1,5 +1,5 @@
 let NETLIFY_ACCESS_TOKEN = 'X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs'; // Replace with your Netlify access token
-let MAIN_DOMAIN = 'example.com'; // Replace with your main domain
+let MAIN_DOMAIN = 'n0s.top'; // Replace with your main domain
 let PROXY_SERVER = 'https://cors-anywhere.herokuapp.com/'; // Proxy server to bypass CORS restriction
 
 function checkAvailability() {

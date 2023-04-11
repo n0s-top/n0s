@@ -1,23 +1,20 @@
-let NETLIFY_ACCESS_TOKEN = 'X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs'; // Replace with your netlify access token
-let MAIN_DOMAIN = 'n0s.top'; // Replace with your main domain
+let NETLIFY_ACCESS_TOKEN = 'X3aBkSGdj-bi9djQCqJJNxwghw1smDgwMHbylcAmkJs'; // Replace with your Netlify access token
+let MAIN_DOMAIN = 'example.com'; // Replace with your main domain
 let PROXY_SERVER = 'https://cors-anywhere.herokuapp.com/'; // Proxy server to bypass CORS restriction
 
 function checkAvailability() {
-  const subdomain = document.getElementById("subdomain").value;
-  const siteId = document.getElementById("siteId").value;
+  const username = document.getElementById("username").value;
 
-  if (subdomain.trim() === "") {
-    alert("Please enter a subdomain name.");
+  if (username.trim() === "") {
+    alert("Please enter a GitHub username.");
     return false;
   }
 
-  if (siteId.trim() === "") {
-    alert("Please enter a Netlify site ID.");
-    return false;
-  }
+  const subdomain = username.toLowerCase();
+  const siteId = 'your-netlify-site-id';
 
   const request = new XMLHttpRequest();
-  request.open("GET", `https://${subdomain}.n0s.top`, true);
+  request.open("GET", `https://${subdomain}.${MAIN_DOMAIN}`, true);
   request.withCredentials = true;
 
   request.onload = function() {
@@ -36,7 +33,7 @@ function checkAvailability() {
 
           request3.onload = function() {
             if (request3.status === 200) {
-              alert(`Subdomain ${subdomain}.n0s.top has been created and linked to your Netlify site, and DNS record has been added for ${subdomain}.${MAIN_DOMAIN}.`);
+              alert(`Subdomain ${subdomain}.${MAIN_DOMAIN} has been created and linked to your Netlify site, and a DNS record has been added for ${subdomain}.${MAIN_DOMAIN}.`);
               location.reload();
             } else {
               alert(`Failed to add DNS record for ${subdomain}.${MAIN_DOMAIN}.`);
@@ -46,28 +43,27 @@ function checkAvailability() {
           request3.send(JSON.stringify({
             type: "CNAME",
             hostname: subdomain,
-            value: `${subdomain}.n0s.top`
+            value: `${subdomain}.${MAIN_DOMAIN}`
           }));
         } else {
-          alert(`Failed to link subdomain ${subdomain}.n0s.top to your Netlify site.`);
+          alert(`Failed to link subdomain ${subdomain}.${MAIN_DOMAIN} to your Netlify site.`);
         }
       }
 
       request2.send(JSON.stringify({
         subdomain: subdomain,
-        domain: "n0s.top"
+        domain: MAIN_DOMAIN
       }));
     } else {
-      alert(`Subdomain ${subdomain}.n0s.top already exists. Please choose another subdomain name.`);
+      alert(`Subdomain ${subdomain}.${MAIN_DOMAIN} already exists. Please choose another username.`);
     }
   };
 
   request.onerror = function() {
-    alert(`Failed to check subdomain availability for ${subdomain}.n0s.top.`);
+    alert(`Failed to check subdomain availability for ${subdomain}.${MAIN_DOMAIN}.`);
   };
 
   request.send();
 
   return false;
 }
-
